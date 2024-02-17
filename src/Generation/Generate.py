@@ -14,11 +14,9 @@ class CodeGenerator:
         self.strings: int = 0
 
     def write_print(self, string: str):
-        self.data.append(
-            f"""
-    s{self.strings} db {string}, 0
-    s{self.strings}l equ $ - s{self.strings}\n
-""")
+        self.data.append(f"""
+    s{self.strings} db '{string}', 0
+    s{self.strings}l equ $ - s{self.strings}""")
 
         self.text.append(
             f"""
@@ -26,19 +24,22 @@ class CodeGenerator:
     mov rdi, 1
     mov rsi, s{self.strings}
     mov rdx, s{self.strings}l
-    syscall\n
-""")
+    syscall""")
+        self.strings += 1
 
     def write_exit(self, code: int):
         self.text.append(
             f"""
     mov rax, 60
     mov rdi, {code}
-    syscall\n
-            """)
+    syscall""")
 
     def write_code(self):
-        os.mkdir("../../out/")
+        try:
+            os.mkdir("../../out/")
+        except FileExistsError:
+            pass
+
         with open("../../out/out.asm", 'w') as f:
             f.write("section .data")
             for sec in self.data:
@@ -47,7 +48,7 @@ class CodeGenerator:
             f.write("\n\n")
             f.write("section .text\n")
             f.write("global _start\n")
-            f.write("_start:\n")
+            f.write("_start:")
 
             for sec in self.text:
                 f.write(sec + "\n")
@@ -55,5 +56,7 @@ class CodeGenerator:
 
 if __name__ == '__main__':
     cg = CodeGenerator("../../tests/print.px")
+    cg.write_print("Hello ")
+    cg.write_print("World!")
     cg.write_exit(0)
     cg.write_code()
