@@ -1,4 +1,5 @@
 from src.Tokenisation import Tokeniser
+import os
 
 
 class CodeGenerator:
@@ -37,7 +38,8 @@ class CodeGenerator:
             """)
 
     def write_code(self):
-        with (open("../../out/out.asm", 'w') as f):
+        os.mkdir("../../out/")
+        with open("../../out/out.asm", 'w') as f:
             f.write("section .data")
             for sec in self.data:
                 f.write(sec + "\n")
