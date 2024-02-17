@@ -14,7 +14,7 @@ def main():
 
         tokeniser:Tokeniser = Tokeniser.Tokeniser(code)
 
-        print(tokeniser.tokenise())
+        print(f"Tokens: {tokeniser.tokenise()}")
         
 
 if __name__ == "__main__":

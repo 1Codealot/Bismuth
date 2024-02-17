@@ -16,12 +16,7 @@ class Tokeniser:
         self.program_len:int = len(text)
 
     def consume(self):
-        # print(f"consuming {self.buf}")
-
         self.found_tokens.append(self.buf)
-
-        print(f"consumed: {self.found_tokens[-1]}")
-
         self.buf = ""
 
     def tokenise(self):
@@ -30,8 +25,7 @@ class Tokeniser:
             self.buf += self.text[self.idx]
             if self.idx == self.program_len - 1:
                 self.consume()
-            else:
-                if self.buf in self.tokens_to_find or self.text[self.idx+1] in self.tokens_to_find:
+            elif self.buf in self.tokens_to_find or self.text[self.idx+1] in self.tokens_to_find:
                     self.consume()
 
             self.idx += 1
