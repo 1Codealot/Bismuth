@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 import sys
-import Tokenisation.Tokeniser as Tokeniser
+import Generation.Generate
+import time
 
 
 def main():
@@ -10,13 +11,10 @@ def main():
         return
     file = sys.argv[1]
 
-    with open(file, "r") as f:
-        code = f.read()
-
-        tokeniser: Tokeniser = Tokeniser.Tokeniser(code)
-
-        print(f"Tokens: {tokeniser.tokenise()}")
+    code_gen = Generation.Generate.CodeGenerator(file)
 
 
 if __name__ == "__main__":
+    t1 = time.time()
     main()
+    print(f"Time taken: {time.time() - t1}")
