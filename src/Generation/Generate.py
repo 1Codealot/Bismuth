@@ -1,21 +1,23 @@
 from src.Tokenisation import Tokeniser
-import os
 
 
 class CodeGenerator:
     def __init__(self, code):
         self.tokens = Tokeniser.Tokeniser(open(code, 'r').read()).tokenise()  # Best line of code ever written lol.
 
-        print(self.tokens)
+        self.builtin_functions = {
+            "exit": self.write_exit,
+            "print": self.write_print
+        }
 
         self.data: list[str] = []  # For `section .data` in asm
         self.text: list[str] = []
 
         self.strings: int = 0
 
-    def write_print(self, string: str):
+    def write_print(self, args: list[str]):
         self.data.append(f"""
-    s{self.strings} db '{string}', 0
+    s{self.strings} db '{args[0].strip('"')}', 0
     s{self.strings}l equ $ - s{self.strings}""")
 
         self.text.append(
@@ -27,20 +29,15 @@ class CodeGenerator:
     syscall""")
         self.strings += 1
 
-    def write_exit(self, code: int):
+    def write_exit(self, args: list[str]):
         self.text.append(
             f"""
     mov rax, 60
-    mov rdi, {code}
+    mov rdi, {args[0]}
     syscall""")
 
     def write_code(self):
-        try:
-            os.mkdir("../../out/")
-        except FileExistsError:
-            pass
-
-        with open("../../out/out.asm", 'w') as f:
+        with open("./out/out.asm", 'w') as f:
             f.write("section .data")
             for sec in self.data:
                 f.write(sec + "\n")
@@ -53,10 +50,22 @@ class CodeGenerator:
             for sec in self.text:
                 f.write(sec + "\n")
 
+    def parse(self):
+        token_idx: int = 0
+        while token_idx < len(self.tokens):
+            if (func_token := self.tokens[token_idx]) in self.builtin_functions:
+                token_idx += 1
+                if self.tokens[token_idx] != "(":
+                    print("Error: Expected `(`")
+                    exit(1)
 
-if __name__ == '__main__':
-    cg = CodeGenerator("../../tests/print.px")
-    cg.write_print("Hello ")
-    cg.write_print("World!")
-    cg.write_exit(0)
-    cg.write_code()
+                token_idx += 1
+                args: list = []
+
+                while self.tokens[token_idx] != ")":
+                    args.append(self.tokens[token_idx])
+                    token_idx += 1
+
+                self.builtin_functions[func_token](args)
+
+            token_idx += 1
