@@ -1,19 +1,19 @@
 class Tokeniser:
-    def __init__(self, text:str):
-        self.text:str = text
+    def __init__(self, text: str):
+        self.text: str = text
 
-        self.found_tokens:list[str] = []
-        self.tokens_to_find:list[str] = [
-                "(",
-                ")",
-                "!",
-                "\"",
-                "\n"
-                ]
-        
-        self.buf:str = ""
-        self.idx:int = 0
-        self.program_len:int = len(text)
+        self.found_tokens: list[str] = []
+        self.tokens_to_find: list[str] = [
+            "(",
+            ")",
+            "!",
+            "\"",
+            "\n"
+        ]
+
+        self.buf: str = ""
+        self.idx: int = 0
+        self.program_len: int = len(text)
 
     def parse_string(self):
         # Find the other "
@@ -33,7 +33,7 @@ class Tokeniser:
         if self.buf == "\"":
             self.parse_string()
 
-        self.found_tokens.append(self.buf)
+        self.found_tokens.append(self.buf.strip())
         self.buf = ""
 
     def tokenise(self):
@@ -42,9 +42,12 @@ class Tokeniser:
             self.buf += self.text[self.idx]
             if self.idx == self.program_len - 1:
                 self.consume()
-            elif self.buf in self.tokens_to_find or self.text[self.idx+1] in self.tokens_to_find: # language idea xor
+            elif self.buf in self.tokens_to_find or self.text[self.idx + 1] in self.tokens_to_find:  # lang idea: xor
                 self.consume()
 
             self.idx += 1
+
+        while '' in self.found_tokens:
+            self.found_tokens.pop(self.found_tokens.index(''))
 
         return self.found_tokens
