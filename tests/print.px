@@ -1,3 +1,3 @@
-print("Hello from my own language!")!
-print("It is (very) good!!")!
+print("Hello from my own language!\n")!
+print("It is \t(very)\t good!!\n")!
 exit(0)!

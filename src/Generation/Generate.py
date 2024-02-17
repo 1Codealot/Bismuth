@@ -17,7 +17,7 @@ class CodeGenerator:
 
     def write_print(self, args: list[str]):
         self.data.append(f"""
-    s{self.strings} db '{args[0].strip('"')}', 0
+    s{self.strings} db {str(list(map(ord, args[0].strip('"').encode().decode('unicode_escape')))).strip("[]")}, 0
     s{self.strings}l equ $ - s{self.strings}""")
 
         self.text.append(
