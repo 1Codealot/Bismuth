@@ -1,15 +1,17 @@
+tokens_to_find: list[str] = [
+    "(",
+    ")",
+    "!",
+    "\"",
+    "\n"
+]
+
+
 class Tokeniser:
     def __init__(self, text: str):
         self.text: str = text
 
         self.found_tokens: list[str] = []
-        self.tokens_to_find: list[str] = [
-            "(",
-            ")",
-            "!",
-            "\"",
-            "\n"
-        ]
 
         self.buf: str = ""
         self.idx: int = 0
@@ -42,7 +44,7 @@ class Tokeniser:
             self.buf += self.text[self.idx]
             if self.idx == self.program_len - 1:
                 self.consume()
-            elif self.buf in self.tokens_to_find or self.text[self.idx + 1] in self.tokens_to_find:  # lang idea: xor
+            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find:  # lang idea: xor
                 self.consume()
 
             self.idx += 1

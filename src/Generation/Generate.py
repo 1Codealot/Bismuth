@@ -16,6 +16,9 @@ class CodeGenerator:
         self.strings: int = 0
 
     def write_print(self, args: list[str]):
+        if len(args) != 1:
+            raise SyntaxError
+
         self.data.append(f"""
     s{self.strings} db {str(list(map(ord, args[0].strip('"').encode().decode('unicode_escape')))).strip("[]")}, 0
     s{self.strings}l equ $ - s{self.strings}""")
@@ -30,6 +33,9 @@ class CodeGenerator:
         self.strings += 1
 
     def write_exit(self, args: list[str]):
+        if len(args) != 1:
+            raise SyntaxError
+
         self.text.append(
             f"""
     mov rax, 60
@@ -66,6 +72,14 @@ class CodeGenerator:
                     args.append(self.tokens[token_idx])
                     token_idx += 1
 
-                self.builtin_functions[func_token](args)
+                try:
+                    self.builtin_functions[func_token](args)
+                except SyntaxError:
+                    print(f"Error: Args passed to `{func_token}` is not right.")
+                    exit(1)
+            else:
+                if func_token not in Tokeniser.tokens_to_find:
+                    print(f"Unknown function or key word `{func_token}`.")
+                    exit(1)
 
             token_idx += 1
