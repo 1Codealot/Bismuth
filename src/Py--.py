@@ -30,3 +30,7 @@ if __name__ == "__main__":
     ld = os.system("ld -o out out.o")
     if ld != 0:
         exit(ld)
+
+    if "run" in sys.argv:
+        prog = os.system("./out")
+        exit(prog)
