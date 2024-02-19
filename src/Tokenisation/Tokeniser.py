@@ -38,7 +38,7 @@ class Tokeniser:
             exit(1)
 
     def parse_num(self):
-        while self.text[self.idx+1].isdigit():
+        while self.text[self.idx + 1].isdigit():
             self.idx += 1
             self.buf += self.text[self.idx]
 
@@ -62,7 +62,14 @@ class Tokeniser:
 
             self.idx += 1
 
+        # Remove unnecessary 'tokens'
+        # Empty tokens
         while '' in self.found_tokens:
             self.found_tokens.pop(self.found_tokens.index(''))
+
+        # Comments
+        for t in self.found_tokens:
+            if t[0] == "`" and t[-1] == "`":
+                self.found_tokens.pop(self.found_tokens.index(t))
 
         return self.found_tokens

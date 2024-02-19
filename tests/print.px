@@ -1,3 +1,4 @@
 print("Hello from my own language!\n")!
 print("It is \t(very)\t good!!\n")!
-exit(0)!
+var:int x = 69!
+exit(x)!
