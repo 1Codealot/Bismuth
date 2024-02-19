@@ -1,6 +1,13 @@
 from src.Tokenisation import Tokeniser
 
 
+class Variable:
+    def __init__(self, ident: str, type_of: str, val: str):
+        self.ident = ident
+        self.type_of = type_of
+        self.val = val
+
+
 class CodeGenerator:
     def __init__(self, code):
         self.tokens = Tokeniser.Tokeniser(open(code, 'r').read()).tokenise()  # Best line of code ever written lol.
@@ -9,6 +16,10 @@ class CodeGenerator:
             "exit": self.write_exit,
             "print": self.write_print
         }
+
+        self.token_idx: int = 0
+
+        self.vars: list[Variable] = []
 
         self.data: list[str] = []  # For `section .data` in asm
         self.text: list[str] = []
@@ -56,30 +67,45 @@ class CodeGenerator:
             for sec in self.text:
                 f.write(sec + "\n")
 
+    def parse_var(self):
+        self.token_idx += 2
+        var_type = self.tokens[self.token_idx]
+
+        self.token_idx += 1
+        name = self.tokens[self.token_idx]
+
+        self.token_idx += 2
+        value = self.tokens[self.token_idx]
+
+        self.vars.append(Variable(name, var_type, value))
+        self.token_idx += 1
+
     def parse(self):
-        token_idx: int = 0
-        while token_idx < len(self.tokens):
-            if (func_token := self.tokens[token_idx]) in self.builtin_functions:
-                token_idx += 1
-                if self.tokens[token_idx] != "(":
+        self.token_idx: int = 0
+        while self.token_idx < len(self.tokens):
+            if (func_token := self.tokens[self.token_idx]) in self.builtin_functions:
+                self.token_idx += 1
+                if self.tokens[self.token_idx] != "(":
                     print("Error: Expected `(`")
                     exit(1)
 
-                token_idx += 1
+                self.token_idx += 1
                 args: list = []
 
-                while self.tokens[token_idx] != ")":
-                    args.append(self.tokens[token_idx])
-                    token_idx += 1
+                while self.tokens[self.token_idx] != ")":
+                    args.append(self.tokens[self.token_idx])
+                    self.token_idx += 1
 
                 try:
                     self.builtin_functions[func_token](args)
                 except SyntaxError:
                     print(f"Error: Args passed to `{func_token}` is not right.")
                     exit(1)
+            elif func_token == "var":
+                self.parse_var()
             else:
                 if func_token not in Tokeniser.tokens_to_find:
                     print(f"Unknown function or key word `{func_token}`.")
                     exit(1)
 
-            token_idx += 1
+            self.token_idx += 1

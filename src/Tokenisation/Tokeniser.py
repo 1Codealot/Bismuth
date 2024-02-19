@@ -1,9 +1,15 @@
 tokens_to_find: list[str] = [
+    # Symbols
     "(",
     ")",
     "!",
     "\"",
-    "\n"
+    "\n",
+    ":",
+    "=",
+    # Keywords
+    "var",
+    "int"
 ]
 
 
@@ -31,9 +37,16 @@ class Tokeniser:
             print("Error: No end of string found.")
             exit(1)
 
+    def parse_num(self):
+        while self.text[self.idx+1].isdigit():
+            self.idx += 1
+            self.buf += self.text[self.idx]
+
     def consume(self):
         if self.buf == "\"":
             self.parse_string()
+        elif self.buf.isdigit():
+            self.parse_num()
 
         self.found_tokens.append(self.buf.strip())
         self.buf = ""
@@ -44,7 +57,7 @@ class Tokeniser:
             self.buf += self.text[self.idx]
             if self.idx == self.program_len - 1:
                 self.consume()
-            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find:  # lang idea: xor
+            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find or self.buf.isdigit():  # lang idea: xor
                 self.consume()
 
             self.idx += 1
