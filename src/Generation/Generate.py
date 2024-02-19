@@ -12,6 +12,8 @@ class CodeGenerator:
     def __init__(self, code):
         self.tokens = Tokeniser.Tokeniser(open(code, 'r').read()).tokenise()  # Best line of code ever written lol.
 
+        # print(f"Token = {self.tokens}")
+
         self.builtin_functions = {
             "exit": self.write_exit,
             "print": self.write_print
@@ -95,17 +97,21 @@ class CodeGenerator:
                 f.write(sec + "\n")
 
     def parse_var(self):
-        self.token_idx += 2
-        var_type = self.tokens[self.token_idx]
+        if self.tokens[self.token_idx] == "var":
+            self.token_idx += 2
+            var_type = self.tokens[self.token_idx]
 
-        self.token_idx += 1
-        name = self.tokens[self.token_idx]
+            self.token_idx += 1
+            name = self.tokens[self.token_idx]
 
-        self.token_idx += 2
-        value = self.tokens[self.token_idx]
+            self.token_idx += 2
+            value = self.tokens[self.token_idx]
 
-        self.vars.append(Variable(name, var_type, value))
-        self.token_idx += 1
+            self.vars.append(Variable(name, var_type, value))
+            self.token_idx += 1
+        else:
+            self.get_var_from_ident(self.tokens[self.token_idx]).val = self.tokens[self.token_idx+2]
+            self.token_idx += 3
 
     def parse(self):
         self.token_idx: int = 0
@@ -129,6 +135,8 @@ class CodeGenerator:
                     print(f"Error: Args passed to `{func_token}` is not right.")
                     exit(1)
             elif func_token == "var":
+                self.parse_var()
+            elif func_token in self.get_var_names():
                 self.parse_var()
             else:
                 if func_token not in Tokeniser.tokens_to_find:
