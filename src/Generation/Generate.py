@@ -26,6 +26,17 @@ class CodeGenerator:
 
         self.strings: int = 0
 
+    def get_var_names(self) -> list:
+        return list(map(lambda v: v.ident, self.vars))
+
+    def get_var_from_ident(self, ident: str) -> Variable:
+        if ident not in self.get_var_names():
+            raise NameError
+        else:
+            for v in self.vars:
+                if v.ident == ident:
+                    return v
+
     def write_print(self, args: list[str]):
         if len(args) != 1:
             raise SyntaxError
@@ -47,10 +58,26 @@ class CodeGenerator:
         if len(args) != 1:
             raise SyntaxError
 
+        value = 0
+
+        if args[0] in self.get_var_names():
+            var = self.get_var_from_ident(args[0])  # No need to catch error because we check right above
+
+            if var.type_of != "int":
+                print(f"Type of variable {var.ident} not `int`")
+            else:
+                value = int(var.val)
+        else:
+            try:
+                value = int(args[0])
+            except ValueError:
+                print("Error: Something went wrong.")
+                exit(1)
+
         self.text.append(
             f"""
     mov rax, 60
-    mov rdi, {args[0]}
+    mov rdi, {value}
     syscall""")
 
     def write_code(self):

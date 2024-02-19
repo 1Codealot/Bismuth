@@ -57,7 +57,7 @@ class Tokeniser:
             self.buf += self.text[self.idx]
             if self.idx == self.program_len - 1:
                 self.consume()
-            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find or self.buf.isdigit():  # lang idea: xor
+            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find or self.buf.isdigit():
                 self.consume()
 
             self.idx += 1
