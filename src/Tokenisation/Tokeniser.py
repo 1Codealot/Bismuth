@@ -55,9 +55,12 @@ class Tokeniser:
         # Go through the code and look to find all the tokens
         while self.idx < self.program_len:
             self.buf += self.text[self.idx]
+            if self.buf.isspace():
+                self.buf = ""
+
             if self.idx == self.program_len - 1:
                 self.consume()
-            elif self.buf in tokens_to_find or self.text[self.idx + 1] in tokens_to_find or self.buf.isdigit():
+            elif (self.buf in tokens_to_find) or (self.text[self.idx + 1] in tokens_to_find) or (self.buf.isdigit()):
                 self.consume()
 
             self.idx += 1
@@ -69,6 +72,7 @@ class Tokeniser:
 
         # Comments
         for t in self.found_tokens:
+            # TODO: Fix this.
             if t[0] == "`" and t[-1] == "`":
                 self.found_tokens.pop(self.found_tokens.index(t))
 

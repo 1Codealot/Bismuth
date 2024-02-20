@@ -109,6 +109,9 @@ class CodeGenerator:
             self.token_idx += 2
             value = self.tokens[self.token_idx]
 
+            while value in self.get_var_names():
+                value = self.get_var_from_ident(value).val
+
             self.vars.append(Variable(name, var_type, value))
             self.token_idx += 1
         else:
