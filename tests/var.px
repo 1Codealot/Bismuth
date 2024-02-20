@@ -1,3 +1,2 @@
-var:int exitcode = 69! `This is a comment`
-exitcode = 10!
-exit(exitcode)!
+var:int n = 10!
+exit(n)!

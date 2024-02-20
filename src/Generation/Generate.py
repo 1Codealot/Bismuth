@@ -103,6 +103,8 @@ class CodeGenerator:
 
             self.token_idx += 1
             name = self.tokens[self.token_idx]
+            if not name.isidentifier():
+                raise NameError
 
             self.token_idx += 2
             value = self.tokens[self.token_idx]
@@ -110,7 +112,7 @@ class CodeGenerator:
             self.vars.append(Variable(name, var_type, value))
             self.token_idx += 1
         else:
-            self.get_var_from_ident(self.tokens[self.token_idx]).val = self.tokens[self.token_idx+2]
+            self.get_var_from_ident(self.tokens[self.token_idx]).val = self.tokens[self.token_idx + 2]
             self.token_idx += 3
 
     def parse(self):
@@ -135,9 +137,13 @@ class CodeGenerator:
                     print(f"Error: Args passed to `{func_token}` is not right.")
                     exit(1)
             elif func_token == "var":
-                self.parse_var()
+                try:
+                    self.parse_var()
+                except NameError:
+                    print(f"Error bad identifier name {self.tokens[self.token_idx]}")
+                    exit(1)
             elif func_token in self.get_var_names():
-                self.parse_var()
+                self.parse_var()  # No need to catch exception because we won't allow a bad identifier name
             else:
                 if func_token not in Tokeniser.tokens_to_find:
                     print(f"Unknown function or key word `{func_token}`.")
