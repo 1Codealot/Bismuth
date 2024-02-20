@@ -1,9 +1,9 @@
 var : int a=69!
-var  : int b = 69!
-var: int c = 69!
-var: int d = 69!
-var     : int e =69!
-var  :int f = 69!
-var: int g =    69!
-var: int h= 69!
+var  : int b = a!
+var: int c = b!
+var: int d = c!
+var     : int e =d!
+var  :int f = e!
+var: int g =    f!
+var: int h= g!
 exit(h)!
