@@ -42,6 +42,14 @@ class Tokeniser:
             self.idx += 1
             self.buf += self.text[self.idx]
 
+    def ignore_comment(self):
+        self.buf = ""
+        self.idx += 1
+        while self.text[self.idx] != "`":
+            self.idx += 1
+
+        self.idx += 1
+
     def consume(self):
         if self.buf == "\"":
             self.parse_string()
@@ -58,6 +66,9 @@ class Tokeniser:
             if self.buf.isspace():
                 self.buf = ""
 
+            if self.text[self.idx] == "`":
+                self.ignore_comment()
+
             if self.idx == self.program_len - 1:
                 self.consume()
             elif (self.buf in tokens_to_find) or (self.text[self.idx + 1] in tokens_to_find) or (self.buf.isdigit()):
@@ -69,11 +80,5 @@ class Tokeniser:
         # Empty tokens
         while '' in self.found_tokens:
             self.found_tokens.pop(self.found_tokens.index(''))
-
-        # Comments
-        for t in self.found_tokens:
-            # TODO: Fix this.
-            if t[0] == "`" and t[-1] == "`":
-                self.found_tokens.pop(self.found_tokens.index(t))
 
         return self.found_tokens

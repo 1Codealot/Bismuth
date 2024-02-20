@@ -1,9 +1,11 @@
 var : int a=69!
+`
 var  : int b = a!
 var: int c = b!
 var: int d = c!
 var     : int e =d!
 var  :int f = e!
 var: int g =    f!
-var: int h= g!
+`
+var: int h= a!
 exit(h)!
