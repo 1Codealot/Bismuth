@@ -39,6 +39,9 @@ class CodeGenerator:
                 if v.ident == ident:
                     return v
 
+    def get_var_stack_offset(self, v: Variable):
+        return len(self.vars) - self.vars.index(v)
+
     def write_print(self, args: list[str]):
         if len(args) != 1:
             raise SyntaxError
@@ -60,26 +63,20 @@ class CodeGenerator:
         if len(args) != 1:
             raise SyntaxError
 
-        value = 0
-
         if args[0] in self.get_var_names():
             var = self.get_var_from_ident(args[0])  # No need to catch error because we check right above
 
             if var.type_of != "int":
                 print(f"Type of variable {var.ident} not `int`")
-            else:
-                value = int(var.val)
+
         else:
-            try:
-                value = int(args[0])
-            except ValueError:
-                print("Error: Something went wrong.")
-                exit(1)
+            print(f"Error no var called `{args[0]}` doesn't exist")
+            exit(1)
 
         self.text.append(
             f"""
     mov rax, 60
-    mov rdi, {value}
+    mov rdi, [ rsp + {(self.get_var_stack_offset(var) - 1) * 8} ]
     syscall""")
 
     def write_code(self):
@@ -113,6 +110,11 @@ class CodeGenerator:
                 value = self.get_var_from_ident(value).val
 
             self.vars.append(Variable(name, var_type, value))
+
+            self.text.append(f"""
+    mov rax, {value} ; {name}
+    push rax""")
+
             self.token_idx += 1
         else:
             self.get_var_from_ident(self.tokens[self.token_idx]).val = self.tokens[self.token_idx + 2]
