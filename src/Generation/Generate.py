@@ -1,4 +1,4 @@
-from src.Tokenisation import Tokeniser
+from Tokenisation import Tokeniser
 
 
 class Variable:
