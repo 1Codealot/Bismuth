@@ -52,10 +52,21 @@ class CodeGenerator:
 
         self.text.append(
             f"""
+    mov rax, s{self.strings}l
+    push rax
+
+    mov rax, s{self.strings}
+    push rax""")
+
+        self.vars.append(Variable(f"s{self.strings}l", "str", ""))
+        self.vars.append(Variable(f"s{self.strings}", "str", ""))
+
+        self.text.append(
+            f"""
     mov rax, 1
     mov rdi, 1
-    mov rsi, s{self.strings}
-    mov rdx, s{self.strings}l
+    mov rsi, [ rsp + 0 ]
+    mov rdx, [ rsp + 8 ]
     syscall""")
         self.strings += 1
 
