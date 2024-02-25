@@ -1,6 +1,7 @@
 from Tokenisation import Tokeniser
 
 
+
 class Variable:
     def __init__(self, ident: str, type_of: str, val: str):
         self.ident = ident
@@ -9,6 +10,8 @@ class Variable:
 
 
 class CodeGenerator:
+    # TODO: Stack methods to keep track of stack.
+
     def __init__(self, code):
         self.tokens = Tokeniser.Tokeniser(open(code, 'r').read()).tokenise()  # Best line of code ever written lol.
 
@@ -25,6 +28,8 @@ class CodeGenerator:
 
         self.data: list[str] = []  # For `section .data` in asm
         self.text: list[str] = []
+
+        self.included: list[str] = []
 
         self.strings: int = 0
 
@@ -46,6 +51,9 @@ class CodeGenerator:
         if len(args) != 1:
             raise SyntaxError
 
+        if "print" not in self.included:
+            self.included.append("print")
+
         self.data.append(f"""
     s{self.strings} db {str(list(map(ord, args[0].strip('"').encode().decode('unicode_escape')))).strip("[]")}, 0
     s{self.strings}l equ $ - s{self.strings}""")
@@ -63,16 +71,22 @@ class CodeGenerator:
 
         self.text.append(
             f"""
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, [ rsp + 0 ]
-    mov rdx, [ rsp + 8 ]
-    syscall""")
+    call print
+    
+    pop rax
+    pop rax""")
+        
+        self.vars.pop(len(self.vars) - 1)
+        self.vars.pop(len(self.vars) - 1)
+        
         self.strings += 1
 
     def write_exit(self, args: list[str]):
         if len(args) != 1:
             raise SyntaxError
+
+        if "exit" not in self.included:
+            self.included.append("exit")
 
         if args[0] in self.get_var_names():
             var = self.get_var_from_ident(args[0])  # No need to catch error because we check right above
@@ -86,12 +100,19 @@ class CodeGenerator:
 
         self.text.append(
             f"""
-    mov rax, 60
-    mov rdi, [ rsp + {(self.get_var_stack_offset(var) - 1) * 8} ]
-    syscall""")
+    mov rax, [ rsp + {(self.get_var_stack_offset(var) - 1) * 8} ]
+    push rax
+
+    call exit
+    
+    pop rax""")
 
     def write_code(self):
         with open("./out/out.asm", 'w') as f:
+
+            for inc in self.included:
+                f.write(f'%include "../src/include/builtins/{inc}.asm"\n')
+
             f.write("section .data")
             for sec in self.data:
                 f.write(sec + "\n")
