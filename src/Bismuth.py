@@ -8,7 +8,7 @@ import os
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: Py--.py <file>")
+        print("Usage: Bismuth.py <file>")
         return
     file = sys.argv[1]
 

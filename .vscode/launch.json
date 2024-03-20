@@ -6,7 +6,7 @@
             "name": "print.px",
             "type": "debugpy",
             "request": "launch",
-            "program": "./src/Py--.py",
+            "program": "./src/Bismuth.py",
             "console": "integratedTerminal",
             "args": ["./tests/print.px"],
         },
@@ -14,7 +14,7 @@
             "name": "var.px",
             "type": "debugpy",
             "request": "launch",
-            "program": "./src/Py--.py",
+            "program": "./src/Bismuth.py",
             "console": "integratedTerminal",
             "args": ["./tests/var.px"]
         }
