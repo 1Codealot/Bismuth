@@ -25,12 +25,15 @@ if __name__ == "__main__":
     os.chdir("out")
     nasm = os.system("nasm out.asm -felf64")
     if nasm != 0:
+        print(f"Nasm exited with code {nasm//256}")
         exit(nasm)
 
     ld = os.system("ld -o out out.o")
     if ld != 0:
+        print(f"ld exited with code {ld//256}")
         exit(ld)
 
     if "run" in sys.argv:
         prog = os.system("./out")
+        print(f"Program exited with code {prog//256}")  # IDK why i need to divide by 256
         exit(prog)
