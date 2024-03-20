@@ -94,11 +94,7 @@ class CodeGenerator:
             if var.type_of != "int":
                 print(f"Type of variable {var.ident} not `int`")
 
-        else:
-            print(f"Error no var called `{args[0]}` doesn't exist")
-            exit(1)
-
-        self.text.append(
+            self.text.append(
             f"""
     mov rax, [ rsp + {(self.get_var_stack_offset(var) - 1) * 8} ]
     push rax
@@ -106,6 +102,23 @@ class CodeGenerator:
     call exit
     
     pop rax""")
+
+        else:
+            if not args[0].isdigit():
+                print(f"Error no var called `{args[0]}` doesn't exist")
+                exit(1)
+
+            self.text.append(f"""
+    mov rax, {args[0]}
+    push rax
+
+    call exit
+
+    pop rax
+""")
+
+
+        
 
     def write_code(self):
         with open("./out/out.asm", 'w') as f:
